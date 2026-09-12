@@ -22,10 +22,6 @@ Test / coverage output
 
 .phpunit.result.cache coverage/
 
-Local database dumps
-
-.sql .sql.gz
-
 Archives
 
 .zip .tar .tar.gz .tgz .7z .rar

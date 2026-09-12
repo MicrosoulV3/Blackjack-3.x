@@ -1,7 +1,6 @@
 # TTv3 House Blackjack
 
-A single-player **Blackjack game for TorrentTrader / TTv3** that lets
-tracker members play against the house using their upload credit as
+A single-player **Blackjack game for TorrentTrader / TTv3** that lets members play against the house using their upload credit as
 chips.
 
 ![TTv3 House Blackjack](screenshots/blackjack.webp)
@@ -56,7 +55,7 @@ Pushes do not count against win rate or streaks.
 
 ## Betting Limits
 
-Betting limits are controlled entirely through the TTv3 site
+Betting limits are controlled entirely through the site
 configuration:
 
 ``` php
@@ -79,9 +78,6 @@ Custom wagers use whole numbers only. For example:
 ```
 
 Decimal custom wagers such as `1.3 GB` are not accepted.
-
-Switching between MB and GB changes the wager unit without converting
-the number displayed in the amount field.
 
 ## Blackjack Rules
 

@@ -105,22 +105,16 @@ Pushes do not count against win rate or streaks.
 
 ## Betting Limits
 
-Betting limits are controlled entirely through the site configuration:
+Betting limits are controlled entirely through the site config:
 
 ``` php
 $site_config['blackjack_min_bet'] = 1 * MB;
 $site_config['blackjack_max_bet'] = 100 * GB;
 ```
 
-The configured limits are enforced server-side.
-
 The configured maximum applies to normal wagers and **Double Down**.
 
-**Split is the exception:** if a player has already wagered the
-configured maximum and is dealt a valid pair, the hand may still be
-split. This can temporarily create total exposure of up to twice the
-configured maximum for that hand only. After the hand ends, Repeat Bet
-returns to the original base wager.
+Split wagers: Splitting requires an additional wager equal to your original bet. A split is always allowed on a valid pair if you have enough upload credit, even when your original bet is already at the maximum. The maximum bet applies to each hand, not the combined split wager.
 
 Custom wagers use whole numbers only. For example:
 
@@ -132,10 +126,6 @@ Custom wagers use whole numbers only. For example:
 ```
 
 Decimal custom wagers such as `1.3 GB` are not accepted.
-
-Changing the custom wager unit between MB and GB keeps the visible
-whole-number amount unchanged. For example, switching `1 MB` to GB
-displays `1 GB` rather than converting the field to a decimal value.
 
 ## Blackjack Rules
 
@@ -159,7 +149,7 @@ displays `1 GB` rather than converting the field to a decimal value.
 - A 21 after splitting is not treated as a natural Blackjack.
 - Split Aces receive one additional card per hand and then stand
   automatically.
-- Re-splitting is not currently supported.
+- Re-splitting is not currently supported. Should it?
 
 ## Requirements
 

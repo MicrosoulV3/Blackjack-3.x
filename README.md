@@ -1,4 +1,4 @@
-# TTv3 House Blackjack
+# TTv3.x Blackjack
 
 <figure>
 <img src="screenshots/blackjack-betting.webp" alt="TTv3 House Blackjack" />

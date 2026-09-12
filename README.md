@@ -145,7 +145,21 @@ The card images use **WebP** format.
 
 ### 3. Configure betting limits
 
-Add the desired limits to your TTv3 configuration:
+Change the values to what you want. MB GB should be defined:
+If not, then add this to the very top of your config.php
+``` php
+// File Size Constants - DO NOT MODIFY
+define('KB', 1024);
+define('MB', 1024 * KB);
+define('GB', 1024 * MB);
+
+// Time Constants - DO NOT MODIFY
+define('MINUTE', 60);
+define('HOUR', 60 * MINUTE);
+define('DAY', 24 * HOUR);
+define('WEEK', 7 * DAY);
+```
+And then add this
 
 ``` php
 $site_config['blackjack_min_bet'] = 1 * MB;

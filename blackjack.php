@@ -22,12 +22,21 @@ $GB = 1024 * 1024 * 1024;
 
 $minBet = isset($site_config["blackjack_min_bet"])
     ? (int)$site_config["blackjack_min_bet"]
-    : 100 * $MB;
+    : 0;
 
 $maxBet = isset($site_config["blackjack_max_bet"])
     ? (int)$site_config["blackjack_max_bet"]
-    : 200 * $GB;
+    : 0;
 
+if ($minBet <= 0 || $maxBet <= 0 || $minBet > $maxBet) {
+    show_error_msg(
+        "Blackjack",
+        "Blackjack betting limits are not configured correctly.",
+        1
+    );
+}
+
+$GLOBALS["blackjack_min_bet_runtime"] = $minBet;
 $GLOBALS["blackjack_max_bet_runtime"] = $maxBet;
 
 
@@ -770,17 +779,19 @@ function bj_parse_wager(
     ) {
         $wager = (int)$post["wager_bytes"];
     } else {
-        $amount = isset($post["wager_amount"])
-            ? (float)$post["wager_amount"]
-            : 0.0;
+        $amountRaw = isset($post["wager_amount"])
+            ? trim((string)$post["wager_amount"])
+            : "";
 
         $unit = isset($post["wager_unit"])
             ? strtoupper((string)$post["wager_unit"])
             : "GB";
 
-        if (!is_finite($amount) || $amount <= 0) {
-            throw new RuntimeException("Enter a wager greater than zero.");
+        if ($amountRaw === "" || !ctype_digit($amountRaw) || (int)$amountRaw <= 0) {
+            throw new RuntimeException("Custom wagers must be a whole number greater than zero.");
         }
+
+        $amount = (int)$amountRaw;
 
         if ($unit === "MB") {
             $multiplier = 1024 * 1024;
@@ -791,6 +802,12 @@ function bj_parse_wager(
         }
 
         $wager = (int)round($amount * $multiplier);
+    }
+
+    $wholeMb = 1024 * 1024;
+
+    if ($wager % $wholeMb !== 0) {
+        throw new RuntimeException("Blackjack wagers must be in whole MB amounts.");
     }
 
     if ($wager < $minBet) {
@@ -1247,6 +1264,14 @@ function bj_play_action(
             }
 
             $baseWager = (int)$game["wager"];
+            $splitTotal = $baseWager * 2;
+
+            if ($splitTotal > $maxBet) {
+                throw new RuntimeException(
+                    "Splitting would exceed the maximum wager of " . mksize($maxBet) . "."
+                );
+            }
+
             $user = bj_query_one(
                 $db,
                 "SELECT uploaded
@@ -1290,7 +1315,7 @@ function bj_play_action(
 
             $db->query(
                 "UPDATE blackjack_games
-                 SET wager = " . ($baseWager * 2) . ",
+                 SET wager = " . $splitTotal . ",
                      player_cards = " . sqlesc(bj_encode_split_state($split)) . ",
                      shoe_pos = " . $shoePos . ",
                      player_points = " . bj_hand_value($handOne, $deck) . ",
@@ -1299,7 +1324,7 @@ function bj_play_action(
                    AND status = 'playing'"
             );
 
-            $game["wager"] = $baseWager * 2;
+            $game["wager"] = $splitTotal;
             $game["player_cards"] = bj_encode_split_state($split);
             $game["shoe_pos"] = $shoePos;
 
@@ -2210,7 +2235,12 @@ function bj_page_start(): void
             return 0;
         }
 
-        var value = parseFloat(amount.value || "0");
+        var raw = String(amount.value || "").trim();
+        if(!/^\d+$/.test(raw)){
+            return 0;
+        }
+
+        var value = parseInt(raw, 10);
         if(!isFinite(value) || value <= 0){
             return 0;
         }
@@ -2219,7 +2249,25 @@ function bj_page_start(): void
             ? 1073741824
             : 1048576;
 
-        return Math.round(value * multiplier);
+        return value * multiplier;
+    }
+
+    function updateCustomLimits(form){
+        var amount = form.querySelector("#blackjackAmount");
+        var unit = form.querySelector("#blackjackUnit");
+        if(!amount || !unit){
+            return;
+        }
+
+        var multiplier = unit.value === "GB"
+            ? 1073741824
+            : 1048576;
+
+        var minBet = parseInt(form.getAttribute("data-min-bet"), 10) || 0;
+        var maxBet = parseInt(form.getAttribute("data-max-bet"), 10) || 0;
+
+        amount.min = String(Math.max(1, Math.ceil(minBet / multiplier)));
+        amount.max = String(Math.floor(maxBet / multiplier));
     }
 
     function setDealState(form, bytes){
@@ -2266,8 +2314,7 @@ function bj_page_start(): void
         var multiplier = useGb ? GB : MB;
         amount.value = String(bytes / multiplier);
 
-        var minBet = parseInt(form.getAttribute("data-min-bet"), 10) || 0;
-        amount.min = String(minBet / multiplier);
+        updateCustomLimits(form);
     }
 
     function initWager(){
@@ -2279,9 +2326,7 @@ function bj_page_start(): void
         var hidden = form.querySelector("#blackjackWagerBytes");
         var unit = form.querySelector("#blackjackUnit");
 
-        if(unit){
-            unit.dataset.previousUnit = unit.value;
-        }
+        updateCustomLimits(form);
 
         if(hidden && hidden.value !== ""){
             setDealState(form, parseInt(hidden.value, 10) || 0);
@@ -2512,6 +2557,14 @@ function bj_page_start(): void
         }
     });
 
+    document.addEventListener("keydown", function(event){
+        if(event.target.matches("#blackjackAmount")){
+            if([".", ",", "e", "E", "+", "-"].indexOf(event.key) !== -1){
+                event.preventDefault();
+            }
+        }
+    });
+
     document.addEventListener("input", function(event){
         if(event.target.matches("#blackjackAmount")){
             var form = event.target.closest("#blackjackWagerForm");
@@ -2531,31 +2584,10 @@ function bj_page_start(): void
             var form = event.target.closest("#blackjackWagerForm");
             if(form){
                 var hidden = form.querySelector("#blackjackWagerBytes");
-                var amount = form.querySelector("#blackjackAmount");
-                var unit = event.target;
-                var previousUnit = unit.dataset.previousUnit || "MB";
-                var previousMultiplier = previousUnit === "GB"
-                    ? 1073741824
-                    : 1048576;
-                var nextMultiplier = unit.value === "GB"
-                    ? 1073741824
-                    : 1048576;
 
-                if(amount){
-                    var value = parseFloat(amount.value || "0");
-                    if(isFinite(value) && value >= 0){
-                        var currentBytes = value * previousMultiplier;
-                        amount.value = String(currentBytes / nextMultiplier);
-                    }
-
-                    var minBet = parseInt(
-                        form.getAttribute("data-min-bet"),
-                        10
-                    ) || 0;
-                    amount.min = String(minBet / nextMultiplier);
-                }
-
-                unit.dataset.previousUnit = unit.value;
+                // Keep the visible whole number unchanged when switching units.
+                // Example: 1 MB -> switch to GB -> display remains 1, now meaning 1 GB.
+                updateCustomLimits(form);
 
                 if(hidden){
                     hidden.value = "";
@@ -2734,6 +2766,7 @@ function bj_render_wager_screen(
     $GB = 1024 * 1024 * 1024;
 
     $quickBets = [
+        $minBet,
         100 * $MB,
         250 * $MB,
         500 * $MB,
@@ -2744,7 +2777,11 @@ function bj_render_wager_screen(
         50 * $GB,
         100 * $GB,
         200 * $GB,
+        $maxBet,
     ];
+
+    $quickBets = array_values(array_unique(array_map("intval", $quickBets)));
+    sort($quickBets, SORT_NUMERIC);
 
     bj_page_start();
 
@@ -2757,11 +2794,8 @@ function bj_render_wager_screen(
         . mksize($balance) . '</span>';
     echo '</div>';
 
-    $minBetMb = $minBet / 1048576;
-    $minBetMbValue = rtrim(
-        rtrim(sprintf("%.8F", $minBetMb), "0"),
-        "."
-    );
+    $minBetMbValue = max(1, (int)ceil($minBet / 1048576));
+    $maxBetMbValue = (int)floor($maxBet / 1048576);
 
     echo '<form id="blackjackWagerForm" method="post" '
         . 'action="blackjack.php" autocomplete="off" '
@@ -2795,9 +2829,10 @@ function bj_render_wager_screen(
 
     echo '<div class="blackjack-custom">';
     echo '<input id="blackjackAmount" type="number" '
-        . 'name="wager_amount" min="' . bj_h($minBetMbValue) . '" '
-        . 'step="any" value="' . bj_h($minBetMbValue) . '" '
-        . 'autocomplete="off">';
+        . 'name="wager_amount" min="' . bj_h((string)$minBetMbValue) . '" '
+        . 'max="' . bj_h((string)$maxBetMbValue) . '" '
+        . 'step="1" value="' . bj_h((string)$minBetMbValue) . '" '
+        . 'inputmode="numeric" autocomplete="off">';
 
     echo '<select id="blackjackUnit" name="wager_unit" '
         . 'autocomplete="off">';
@@ -2921,9 +2956,13 @@ function bj_render_hand(array $game, array $deck, string $animation): void
             );
         }
 
+        $splitCost = (int)$game["wager"];
+        $splitTotal = $splitCost * 2;
+
         if (
             bj_can_split($playerCards, $deck)
-            && $balance >= (int)$game["wager"]
+            && $balance >= $splitCost
+            && $splitTotal <= $GLOBALS["blackjack_max_bet_runtime"]
         ) {
             bj_action_form(
                 "Split — " . mksize((int)$game["wager"]),
@@ -3100,7 +3139,11 @@ function bj_render_result(array $game, array $deck, string $animation): void
         ? (int)$split["base_wager"]
         : (int)$game["wager"];
 
-    if ($repeatWager <= $balance) {
+    if (
+        $repeatWager >= $GLOBALS["blackjack_min_bet_runtime"]
+        && $repeatWager <= $GLOBALS["blackjack_max_bet_runtime"]
+        && $repeatWager <= $balance
+    ) {
         echo '<form method="post" action="blackjack.php" '
             . 'autocomplete="off">';
 

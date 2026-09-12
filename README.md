@@ -125,12 +125,9 @@ displays `1 GB` rather than converting the field to a decimal value.
 
 ## Requirements
 
-- TorrentTrader / TTv3
+- TTv3 / TTv3.x
 - PHP 8.x supported
 - MySQL or MariaDB
-- MySQLi
-- Existing TTv3 user authentication
-- Existing `users.uploaded` upload-credit balance
 
 ## Installation
 

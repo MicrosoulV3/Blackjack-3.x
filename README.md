@@ -4,7 +4,7 @@ A single-player Blackjack game for TorrentTrader / TTv3.x that lets
 members play against the house using their upload credit as chips.
 
 <figure>
-<img src="screenshots/blackjack.webp" alt="TTv3 House Blackjack" />
+<img src="screenshots/blackjack-betting.webp" alt="TTv3 House Blackjack" />
 <figcaption aria-hidden="true">TTv3 House Blackjack</figcaption>
 </figure>
 

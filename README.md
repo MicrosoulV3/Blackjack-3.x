@@ -166,14 +166,14 @@ $site_config['blackjack_min_bet'] = 1 * MB;
 $site_config['blackjack_max_bet'] = 100 * GB;
 ```
 
-Change these values to suit your tracker economy.
+Change these to suit what you like.
 
 ### 4. Add sounds and ambience
 
 The game supports Blackjack sound effects and casino-room ambience. Keep
 the supplied sound assets in the paths referenced by `blackjack.php`.
 
-Users can independently disable normal game sounds or room ambience.
+Users can independently disable normal game sounds or room ambience. Mute is persistent.
 
 ## Upload Credit
 

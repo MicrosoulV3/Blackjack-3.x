@@ -49,37 +49,37 @@
 
 ### Betting and Player Stats
 
-Quick bets, custom MB / GB wagers, configurable limits, persistent sound controls, and player statistics.
+Pick a quick bet or enter your own wager in MB or GB. Your balance, betting limits, and player stats are all shown on the same screen.
 
 ![Blackjack betting screen](screenshots/blackjack-betting.webp)
 
 ### Active Hand
 
-A normal hand in progress with **Hit**, **Stand**, and **Double Down** available.
+Once the cards are dealt, just play the hand. **Hit**, **Stand**, and **Double Down** are available when the hand allows them.
 
 ![Blackjack active hand](screenshots/blackjack-hand.webp)
 
 ### Split
 
-When the opening cards are a valid pair, **Split** becomes available.
+Get dealt a pair and the **Split** button shows up.
 
 ![Blackjack split available](screenshots/blackjack-split-available.webp)
 
 ### Split in Progress
 
-Each split hand is played separately against the dealer.
+After splitting, play each hand one at a time against the dealer.
 
 ![Blackjack split hand in progress](screenshots/blackjack-split.webp)
 
 ### Split Result
 
-Split hands settle independently and the game shows the combined net result. Repeat Bet returns to the original base wager.
+Each split hand gets its own result, and the game shows what you won or lost overall. **Repeat Bet** goes back to your original bet.
 
 ![Blackjack split result](screenshots/blackjack-split-result.webp)
 
 ### Administrator Stat Reset
 
-User class 7 or higher can selectively reset a player's Blackjack statistics without changing upload credit or an active hand.
+Admins with user class 7 or higher can reset a player's Blackjack stats without touching their upload credit or an active game.
 
 ![Blackjack administrator stat reset](screenshots/blackjack-admin-reset.webp)
 
@@ -102,18 +102,18 @@ Pushes do not count against win rate or streaks.
 
 ## Betting Limits
 
-Betting limits are controlled entirely through the site config:
+Set the minimum and maximum bets in your site config:
 
 ``` php
 $site_config['blackjack_min_bet'] = 1 * MB;
 $site_config['blackjack_max_bet'] = 100 * GB;
 ```
 
-The configured maximum applies to normal wagers and **Double Down**.
+Normal bets and **Double Down** stay within the configured maximum.
 
-Split wagers: Splitting requires an additional wager equal to your original bet. A split is always allowed on a valid pair if you have enough upload credit, even when your original bet is already at the maximum. The maximum bet applies to each hand, not the combined split wager.
+**Split works a little differently.** If you get a pair, you can split it as long as you have enough upload credit for the second bet. This still works when your original bet is already at the maximum. The maximum applies to each split hand, not both hands added together.
 
-Custom wagers use whole numbers only. For example:
+Custom bets use whole numbers only. For example:
 
 ``` text
 1 MB
@@ -122,7 +122,7 @@ Custom wagers use whole numbers only. For example:
 25 GB
 ```
 
-Decimal custom wagers such as `1.3 GB` are not accepted.
+Decimals such as `1.3 GB` are not accepted.
 
 ## Blackjack Rules
 
@@ -130,23 +130,16 @@ Decimal custom wagers such as `1.3 GB` are not accepted.
 - Natural Blackjack pays 3:2.
 - Normal wins pay 1:1.
 - Pushes return the wager.
-- Double Down is available on the player’s initial two-card hand when
-  sufficient credit is available and the doubled wager remains within
-  the configured maximum.
-- Double Down draws exactly one additional card and then automatically
-  stands.
-- Split is available only when the two original cards are the same rank.
-- Splitting requires an additional wager equal to the original wager.
-- A valid Split is allowed even when the original wager is already at
-  the configured maximum. The temporary split total may therefore exceed
-  the normal table maximum for that hand only.
-- Repeat Bet after a split uses the original base wager, not the
-  combined split total.
-- Split hands are paid independently at 1:1.
-- A 21 after splitting is not treated as a natural Blackjack.
-- Split Aces receive one additional card per hand and then stand
-  automatically.
-- Re-splitting is not currently supported. Should it?
+- You can Double Down on your first two cards if you have enough upload credit and the doubled bet stays within the maximum.
+- Double Down gives you one more card and then automatically stands.
+- You can Split when your first two cards are the same rank.
+- Splitting costs another bet equal to your original bet.
+- You can still Split when your original bet is at the maximum, as long as you have enough upload credit for the second hand.
+- After a split, **Repeat Bet** uses your original bet.
+- Each split hand pays 1:1.
+- A 21 after splitting is not a natural Blackjack.
+- Split Aces get one card each and automatically stand.
+- Re-splitting is not supported yet.
 
 ## Requirements
 
@@ -158,15 +151,13 @@ Decimal custom wagers such as `1.3 GB` are not accepted.
 
 ### 1. Install the database table
 
-Import the included `blackjack.sql` file into your tracker database
-before using the game.
+Import the included `blackjack.sql` file into your tracker database before using the game.
 
-No database tables are created or altered automatically by the PHP game.
+The PHP does not create or alter database tables for you.
 
 ### 2. Add the Blackjack files
 
-Upload the files while keeping the supplied folder structure.
-`blackjack.php` and `blackjack_split_chart.html` are root files.
+Upload the files and keep the supplied folder structure. Put `blackjack.php` and `blackjack_split_chart.html` in your tracker root.
 
 Playing-cards are expected under:
 
@@ -178,8 +169,7 @@ The card images use **WebP** format.
 
 ### 3. Configure betting limits
 
-Change the values to what you want. MB GB should be defined: If not,
-then add this to the very top of your config.php
+Set the betting limits to whatever works for your tracker. If `MB` and `GB` are not already defined, add these constants near the top of `config.php`:
 
 ``` php
 // File Size Constants - DO NOT MODIFY
@@ -194,41 +184,34 @@ define('DAY', 24 * HOUR);
 define('WEEK', 7 * DAY);
 ```
 
-And then add this
+Then add your Blackjack limits:
 
 ``` php
 $site_config['blackjack_min_bet'] = 1 * MB;
 $site_config['blackjack_max_bet'] = 100 * GB;
 ```
 
-Change these to suit what you like.
+Change those two values to suit your tracker economy.
 
 ### 4. Add sounds and ambience
 
-The game supports Blackjack sound effects and casino-room ambience. Keep
-the supplied sound assets in the paths referenced by `blackjack.php`.
+Keep the supplied sound files in the paths used by `blackjack.php`.
 
-Users can independently disable normal game sounds or room ambience.
-Mute is persistent.
+Players can turn the game sounds and casino-room ambience on or off separately. Their choices are remembered by the browser.
 
 ## Upload Credit
 
-The game treats the existing TTv3 `users.uploaded` value as the player’s
-Blackjack balance.
+Blackjack uses the existing TTv3 `users.uploaded` value as the player's chip balance.
 
-Wagers are deducted from upload credit and payouts are returned to
-upload credit. Balance-changing game actions use database transactions
-and row locking to protect wager operations.
+Bets come out of upload credit and winnings go back into it. The balance updates are handled with database transactions and row locking so two game actions cannot spend the same credit.
 
-This project does **not** use real money.
+This is all virtual upload credit. **No real money is used.**
 
 ## Admin Stat Reset
 
-Administrators can selectively reset an individual player’s Blackjack
-statistics without changing that player’s upload balance or active hand.
+Admins can reset one player's Blackjack stats without changing that player's upload credit or active game.
 
-The current implementation requires **user class 7 or higher** for this
-function.
+This requires **user class 7 or higher**.
 
 ## Security
 
@@ -244,16 +227,13 @@ The game includes:
 - User ownership checks when loading hands
 - Server-side validation of Split and Double Down
 
-Client-side controls are for convenience only; wager and game rules are
-enforced by PHP.
+The buttons and browser-side checks make the game easier to use, but PHP still checks the wagers and game rules on the server.
 
 ## Notes
 
-This is a house game: each logged-in player receives an independent
-Blackjack game against the dealer. Multiple users can play
-simultaneously without sharing a table or game state.
+This is a house game. Every logged-in player gets their own game against the dealer, so multiple people can play at the same time without sharing a table.
 
-The project is intended as a fun feature using virtual upload credit.
+It is meant to be a fun extra for TTv3 sites that want to give members something to do with their upload credit.
 
 ## License
 

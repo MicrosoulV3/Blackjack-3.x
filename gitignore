@@ -1,0 +1,43 @@
+OS / desktop files
+
+.DS_Store Thumbs.db Desktop.ini
+
+Editors / IDEs
+
+.vscode/ .idea/ .swp .swo ~ .bak
+
+Logs and temporary files
+
+.log .tmp .temp .cache
+
+Local environment / secrets
+
+.env .env.* !.env.example
+
+PHP dependencies
+
+/vendor/ composer.phar
+
+Test / coverage output
+
+.phpunit.result.cache coverage/
+
+Local database dumps
+
+.sql .sql.gz
+
+Archives
+
+.zip .tar .tar.gz .tgz .7z .rar
+
+Local runtime files
+
+sessions/ tmp/ temp/ cache/
+
+User-uploaded / generated runtime content
+
+uploads/
+
+Allow placeholder files
+
+!.gitkeep

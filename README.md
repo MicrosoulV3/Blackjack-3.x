@@ -48,6 +48,44 @@ members play against the house using their upload credit as chips.
 - WebP playing-card artwork
 - AJAX-style gameplay without full-page reloads
 
+## Gameplay Screenshots
+
+### Betting and Player Stats
+
+Quick bets, custom MB / GB wagers, configurable limits, persistent sound controls, and player statistics.
+
+![Blackjack betting screen](screenshots/blackjack-betting.webp)
+
+### Active Hand
+
+A normal hand in progress with **Hit**, **Stand**, and **Double Down** available.
+
+![Blackjack active hand](screenshots/blackjack-hand.webp)
+
+### Split Available
+
+When the opening cards are a valid pair, **Split** becomes available alongside the normal hand controls.
+
+![Blackjack split available](screenshots/blackjack-split-available.webp)
+
+### Split in Progress
+
+Each split hand is played independently while the dealer hand is shared.
+
+![Blackjack split hand in progress](screenshots/blackjack-split.webp)
+
+### Split Result
+
+Split hands settle independently and the game shows the combined net result. Repeat Bet returns to the original base wager.
+
+![Blackjack split result](screenshots/blackjack-split-result.webp)
+
+### Administrator Stat Reset
+
+User class 7 or higher can selectively reset a player's Blackjack statistics without changing upload credit or an active hand.
+
+![Blackjack administrator stat reset](screenshots/blackjack-admin-reset.webp)
+
 ## Player Statistics
 
 The game tracks:

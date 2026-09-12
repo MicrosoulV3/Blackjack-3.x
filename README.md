@@ -65,8 +65,13 @@ $site_config['blackjack_max_bet'] = 100 * GB;
 
 The configured limits are enforced server-side.
 
-They also apply to **Split** and **Double Down**, so neither action can
-increase the total wager beyond the configured maximum.
+The configured maximum applies to normal wagers and **Double Down**.
+
+**Split is the exception:** if a player has already wagered the configured
+maximum and is dealt a valid pair, the hand may still be split. This can
+temporarily create total exposure of up to twice the configured maximum for
+that hand only. After the hand ends, Repeat Bet returns to the original base
+wager.
 
 Custom wagers use whole numbers only. For example:
 
@@ -78,6 +83,10 @@ Custom wagers use whole numbers only. For example:
 ```
 
 Decimal custom wagers such as `1.3 GB` are not accepted.
+
+Changing the custom wager unit between MB and GB keeps the visible whole-number
+amount unchanged. For example, switching `1 MB` to GB displays `1 GB` rather
+than converting the field to a decimal value.
 
 ## Blackjack Rules
 
@@ -93,6 +102,11 @@ Decimal custom wagers such as `1.3 GB` are not accepted.
 -   Split is available only when the two original cards are the same
     rank.
 -   Splitting requires an additional wager equal to the original wager.
+-   A valid Split is allowed even when the original wager is already at the
+    configured maximum. The temporary split total may therefore exceed the
+    normal table maximum for that hand only.
+-   Repeat Bet after a split uses the original base wager, not the combined
+    split total.
 -   Split hands are paid independently at 1:1.
 -   A 21 after splitting is not treated as a natural Blackjack.
 -   Split Aces receive one additional card per hand and then stand
@@ -112,44 +126,14 @@ Decimal custom wagers such as `1.3 GB` are not accepted.
 
 ### 1. Install the database table
 
-Run the SQL manually in your tracker database:
-
-``` sql
-CREATE TABLE `blackjack_games` (
-    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-    `user_id` int NOT NULL,
-    `active_key` varchar(64) DEFAULT NULL,
-    `wager` bigint unsigned NOT NULL DEFAULT 0,
-    `status` enum('playing','settled') NOT NULL DEFAULT 'playing',
-    `shoe` text NOT NULL,
-    `shoe_pos` int unsigned NOT NULL DEFAULT 0,
-    `player_cards` text NOT NULL,
-    `dealer_cards` text NOT NULL,
-    `player_points` tinyint unsigned NOT NULL DEFAULT 0,
-    `dealer_points` tinyint unsigned NOT NULL DEFAULT 0,
-    `result` enum('win','loss','push','blackjack') DEFAULT NULL,
-    `payout` bigint unsigned NOT NULL DEFAULT 0,
-    `profit` bigint NOT NULL DEFAULT 0,
-    `created_at` datetime NOT NULL,
-    `updated_at` datetime NOT NULL,
-    `settled_at` datetime DEFAULT NULL,
-
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uniq_blackjack_active_key` (`active_key`),
-    KEY `idx_blackjack_user` (`user_id`),
-    KEY `idx_blackjack_user_status` (`user_id`,`status`),
-    KEY `idx_blackjack_status` (`status`),
-    KEY `idx_blackjack_settled` (`settled_at`)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
-```
+Import the included `blackjack.sql` file into your tracker database before
+using the game.
 
 No database tables are created or altered automatically by the PHP game.
 
 ### 2. Add the Blackjack files
 
-Upload the files keeping folder structure. blackjack.php and blackjack_split_chart.html are root files.
+Upload the files while keeping the supplied folder structure. `blackjack.php` and `blackjack_split_chart.html` are root files.
 
 Playing-cards are expected under:
 
@@ -203,7 +187,7 @@ The game includes:
 -   TTv3 login enforcement
 -   CSRF tokens on game actions
 -   Server-side wager validation
--   Config-enforced minimum and maximum bets
+-   Config-enforced minimum and maximum starting wagers
 -   Transactional credit updates
 -   Row locking during balance-changing actions
 -   Per-user active-game protection

@@ -1266,12 +1266,6 @@ function bj_play_action(
             $baseWager = (int)$game["wager"];
             $splitTotal = $baseWager * 2;
 
-            if ($splitTotal > $maxBet) {
-                throw new RuntimeException(
-                    "Splitting would exceed the maximum wager of " . mksize($maxBet) . "."
-                );
-            }
-
             $user = bj_query_one(
                 $db,
                 "SELECT uploaded
@@ -2957,12 +2951,12 @@ function bj_render_hand(array $game, array $deck, string $animation): void
         }
 
         $splitCost = (int)$game["wager"];
+        // Split may temporarily exceed the configured table max for this hand only.
         $splitTotal = $splitCost * 2;
 
         if (
             bj_can_split($playerCards, $deck)
             && $balance >= $splitCost
-            && $splitTotal <= $GLOBALS["blackjack_max_bet_runtime"]
         ) {
             bj_action_form(
                 "Split — " . mksize((int)$game["wager"]),

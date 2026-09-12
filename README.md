@@ -4,9 +4,6 @@ A single-player **Blackjack game for TorrentTrader / TTv3** that lets
 tracker members play against the house using their upload credit as
 chips.
 
-Built for modern PHP while remaining compatible with older TTv3
-installations.
-
 ![TTv3 House Blackjack](screenshots/blackjack.webp)
 
 ## Features
@@ -109,9 +106,7 @@ the number displayed in the amount field.
 ## Requirements
 
 -   TorrentTrader / TTv3
--   PHP **7.4 or newer**
 -   PHP 8.x supported
--   Tested with PHP **8.4**
 -   MySQL or MariaDB
 -   MySQLi
 -   Existing TTv3 user authentication
@@ -224,18 +219,7 @@ Client-side controls are for convenience only; wager and game rules are
 enforced by PHP.
 
 ## Compatibility
-
-The game was written to work with the legacy TTv3 codebase while running
-on modern PHP.
-
-Current target:
-
-``` text
-PHP 7.4+
-PHP 8.3
-PHP 8.4
-MySQL / MariaDB
-```
+PHP 8.x
 
 ## Notes
 

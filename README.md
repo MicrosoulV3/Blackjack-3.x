@@ -149,10 +149,9 @@ No database tables are created or altered automatically by the PHP game.
 
 ### 2. Add the Blackjack files
 
-Place the Blackjack PHP and supporting files in your tracker
-installation.
+Upload the files keeping folder structure. blackjack.php and blackjack_split_chart.html are root files.
 
-Playing-card artwork is expected under:
+Playing-cards are expected under:
 
 ``` text
 images/blackjack/cards/

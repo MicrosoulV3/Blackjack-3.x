@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blackjack Split Chart</title>
+<style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:22px;font-family:Arial,Helvetica,sans-serif;background:#101418;color:#f3f5f7}
+    .wrap{max-width:760px;margin:0 auto}
+    h1{margin:0 0 6px;text-align:center;font-size:28px}
+    .sub{margin:0 0 18px;text-align:center;color:#aeb7c0;font-size:14px}
+    .note{margin:0 0 18px;padding:12px 14px;border:1px solid #39434d;border-radius:10px;background:#171d22;line-height:1.45}
+    table{width:100%;border-collapse:collapse;background:#171d22;border:1px solid #39434d;border-radius:10px;overflow:hidden}
+    th,td{padding:11px 12px;border-bottom:1px solid #303943;text-align:left;vertical-align:top}
+    th{background:#20272e;font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+    tr:last-child td{border-bottom:0}
+    .split{font-weight:bold;color:#b7efbd}
+    .dont{font-weight:bold;color:#ffb8b8}
+    .always{font-weight:bold;color:#9fe6ac}
+    .never{font-weight:bold;color:#ffc3c3}
+    .close{display:block;margin:20px auto 0;min-width:130px;height:42px;padding:0 18px;border:1px solid #687786;border-radius:8px;background:#263545;color:#fff;font-weight:bold;cursor:pointer}
+    .close:hover{background:#31465b}
+    @media(max-width:600px){body{padding:12px}h1{font-size:23px}th,td{padding:9px 8px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Blackjack Split Chart</h1>
+    <p class="sub">Quick reference for deciding when to split a pair.</p>
+
+    <div class="note">
+        <strong>Important:</strong> The game only offers Split when the two dealt cards are the same rank, such as 8 + 8, K + K, or Q + Q. Cards that merely share the same point value, such as Q + 10, are not treated as a pair.
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Your Cards</th><th>Dealer's Upcard</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Aces (A, A)</td><td>Any</td><td class="always">Always Split</td></tr>
+            <tr><td>8s (8, 8)</td><td>Any</td><td class="always">Always Split</td></tr>
+            <tr><td>10s (10, 10 or Face Cards)</td><td>Any</td><td class="never">Never Split</td></tr>
+            <tr><td rowspan="2">9s (9, 9)</td><td>2–6, 8, 9</td><td class="split">Split</td></tr>
+            <tr><td>7, 10, Ace</td><td class="dont">Don't Split</td></tr>
+            <tr><td rowspan="2">7s (7, 7)</td><td>2–7</td><td class="split">Split</td></tr>
+            <tr><td>8–Ace</td><td class="dont">Don't Split</td></tr>
+            <tr><td rowspan="2">6s (6, 6)</td><td>2–6</td><td class="split">Split</td></tr>
+            <tr><td>7–Ace</td><td class="dont">Don't Split</td></tr>
+            <tr><td>5s (5, 5)</td><td>Any</td><td class="never">Never Split (Double Down if possible)</td></tr>
+            <tr><td rowspan="2">4s (4, 4)</td><td>5–6</td><td class="split">Split</td></tr>
+            <tr><td>2–4, 7–Ace</td><td class="dont">Don't Split</td></tr>
+            <tr><td rowspan="2">3s (3, 3)</td><td>2–7</td><td class="split">Split</td></tr>
+            <tr><td>8–Ace</td><td class="dont">Don't Split</td></tr>
+            <tr><td rowspan="2">2s (2, 2)</td><td>2–7</td><td class="split">Split</td></tr>
+            <tr><td>8–Ace</td><td class="dont">Don't Split</td></tr>
+        </tbody>
+    </table>
+
+    <button class="close" type="button" onclick="window.close()">Close Window</button>
+</div>
+</body>
+</html>

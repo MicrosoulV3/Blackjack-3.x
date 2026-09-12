@@ -62,15 +62,15 @@ A normal hand in progress with **Hit**, **Stand**, and **Double Down** available
 
 ![Blackjack active hand](screenshots/blackjack-hand.webp)
 
-### Split Available
+### Split
 
-When the opening cards are a valid pair, **Split** becomes available alongside the normal hand controls.
+When the opening cards are a valid pair, **Split** becomes available.
 
 ![Blackjack split available](screenshots/blackjack-split-available.webp)
 
 ### Split in Progress
 
-Each split hand is played independently while the dealer hand is shared.
+Each split hand is played separately against the dealer.
 
 ![Blackjack split hand in progress](screenshots/blackjack-split.webp)
 

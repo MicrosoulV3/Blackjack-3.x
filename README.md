@@ -1,6 +1,6 @@
 # TTv3 House Blackjack
 
-A single-player **Blackjack game for TorrentTrader / TTv3.x that lets members play against the house using their upload credit as
+A single-player Blackjack game for TorrentTrader / TTv3.x that lets members play against the house using their upload credit as
 chips.
 
 ![TTv3 House Blackjack](screenshots/blackjack.webp)

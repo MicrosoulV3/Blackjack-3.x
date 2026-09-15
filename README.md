@@ -191,7 +191,7 @@ $site_config['blackjack_min_bet'] = 1 * MB;
 $site_config['blackjack_max_bet'] = 100 * GB;
 ```
 
-Change those two values to suit your tracker economy.
+Change those two values to suit what you like.
 
 ### 4. Add sounds and ambience
 

@@ -193,9 +193,7 @@ $site_config['blackjack_max_bet'] = 100 * GB;
 
 Change those two values to suit what you like.
 
-### 4. Add sounds and ambience
-
-Keep the supplied sound files in the paths used by `blackjack.php`.
+### 4. sounds and ambience
 
 Players can turn the game sounds and casino-room ambience on or off separately. Their choices are remembered by the browser.
 
